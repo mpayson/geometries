@@ -1,0 +1,50 @@
+{
+  "name": "geometries",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@arcgis/core": "^4.18.1",
+    "@esri/calcite-components": "^1.0.0-beta.51",
+    "@terraformer/arcgis": "^2.0.7",
+    "@terraformer/wkt": "^2.0.7",
+    "@testing-library/jest-dom": "^5.11.4",
+    "@testing-library/react": "^11.1.0",
+    "@testing-library/user-event": "^12.1.10",
+    "react": "^17.0.1",
+    "react-dom": "^17.0.1",
+    "react-scripts": "4.0.3",
+    "react-syntax-highlighter": "^15.4.3",
+    "web-vitals": "^1.0.1"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
+    "copy:jsapi": "ncp ./node_modules/@arcgis/core/assets ./public/assets",
+    "copy:calcite": "ncp ./node_modules/@esri/calcite-components/dist/calcite/assets ./public/assets",
+    "postinstall": "npm run copy:jsapi && npm run copy:calcite"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "ncp": "^2.0.0"
+  },
+  "homepage": "https://mpayson.github.io/geometries"
+}

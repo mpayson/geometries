@@ -1,0 +1,15 @@
+#container{
+  display: flex;
+}
+
+#map {
+  flex: auto;
+  width: 100vw;
+  height: 100vh;
+}
+
+#side-panel{
+  width: 30rem;
+  height: 100vh;
+  background-color: var(--calcite-ui-background);
+}
