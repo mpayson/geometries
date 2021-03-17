@@ -1,0 +1,2 @@
+(this.webpackJsonpgeometries=this.webpackJsonpgeometries||[]).push([[224],{1198:function(e,n,r){"use strict";r.r(n);r(45),r(89),r(29),r(25),r(179),r(247),r(444),r(159),r(220),r(294),r(334),r(182),r(248),r(180),r(251);var t=r(252);r.d(n,"HUDMaterial",(function(){return t.a})),r.d(n,"build",(function(){return t.c})),r.d(n,"calculateAnchorPosForRendering",(function(){return t.d}))}}]);
+//# sourceMappingURL=224.3fd6d262.chunk.js.map
