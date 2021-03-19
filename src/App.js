@@ -24,6 +24,7 @@ import spatialReferences, { getLabelForId } from './helpers/SpatialReferences';
 import './App.css';
 
 load();
+const sketchLayer = new GraphicsLayer();
 
 function App() {
   
@@ -36,10 +37,8 @@ function App() {
 
   useEffect(function onMount(){
 
-    const sketchLayer = new GraphicsLayer();
-
     const map = new Map({
-      basemap: 'topo-vector',
+      basemap: 'gray-vector',
       layers: [ sketchLayer ]
     });
 
@@ -49,13 +48,14 @@ function App() {
       zoom: 9,
       map
     });
-
+  
     const expand = new Expand({
       content: new Search({ view }),
       expanded: true,
       view
     });
-    view.ui.add(expand, {position: 'top-left', index: 0});
+    view.ui.add(expand, 'top-right');
+    view.ui.move('zoom', 'top-right');
 
     const sketch = new Sketch({
       layer: sketchLayer,
@@ -63,7 +63,7 @@ function App() {
       layout: 'vertical',
       view
     });
-    view.ui.add(sketch, 'top-right');
+    view.ui.add(sketch, 'top-left');
   
     const createListener = sketch.on(['create'], function onCreate(evt){
       if(evt.state !== 'complete') return;
@@ -86,6 +86,18 @@ function App() {
     }
 
   }, []);
+
+  function onAddGraphic(graphic){
+    mapViewRef.current.graphics.add(graphic);
+    setGraphic(graphic);
+  }
+
+  function onClear(graphic){
+    const view = mapViewRef.current;
+    view.graphics.removeAll();
+    sketchLayer.removeAll();
+    setGraphic(undefined);
+  }
   
   let panelContent;
 
@@ -96,7 +108,10 @@ function App() {
     const geometry = project(graphic.geometry, sr);
 
     const propertyDisplay = propertyFnsByType[geometry.type].map(f => 
-      <p key={f.label}><b>{f.label}: </b>{f.fn(geometry)}</p>
+      <tr key={f.label}>
+        <td>{f.label}</td>
+        <td>{f.fn(geometry)}</td>
+      </tr>
     )
 
     const esriJson = geometry.toJSON();
@@ -125,6 +140,9 @@ function App() {
     panelContent = (
       <>
         <calcite-block heading="Settings"open collapsible>
+          <calcite-label>
+            <calcite-button scale="s" width="full" color="red" appearance="outline" onClick={onClear}>Clear geometries</calcite-button>
+          </calcite-label>
           <calcite-label>
             Projection
             <CalciteDropdown
@@ -158,25 +176,36 @@ function App() {
           </SyntaxHighlighter>
         </calcite-block>
         <calcite-block heading="Properties" summary="Calculated values" open collapsible>
-          {propertyDisplay}
+          <table style={{width: '100%'}}> 
+            <tr>
+              <th>Property</th>
+              <th>Value</th>
+            </tr>
+            {propertyDisplay}
+          </table>
         </calcite-block>
       </>
     )
   } else {
-    panelContent = <GetStartedInfo/>;
+    panelContent = <GetStartedInfo onAddGraphic={onAddGraphic}/>;
   }
 
   return (
-    <div id="container">
-      <div id="map" ref={viewEl}></div>
-      <div id="side-panel">
-        <calcite-panel heading="Geometry Properties" headingLevel="1">
+    <calcite-shell>
+      <calcite-shell-panel slot="primary-panel" position="start" width-scale="m">
+      <calcite-action-bar slot="action-bar" theme="dark">
+        <calcite-action-group>
+          <calcite-action text="Properties" icon="feature-details" active></calcite-action>
+        </calcite-action-group>
+      </calcite-action-bar>
+        <calcite-panel heading="Geometry Properties" headingLevel="1" widthScale="l">
           <div>
             {panelContent}
           </div>
         </calcite-panel>
-      </div>
-    </div>
+      </calcite-shell-panel>
+      <div id="map" ref={viewEl}></div>
+    </calcite-shell>
   );
 }
 

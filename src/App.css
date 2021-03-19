@@ -4,7 +4,7 @@
 
 #map {
   flex: auto;
-  width: 100vw;
+  width: 100%;
   height: 100vh;
 }
 
@@ -12,4 +12,12 @@
   width: 30rem;
   height: 100vh;
   background-color: var(--calcite-ui-background);
+  overflow-y: scroll;
+}
+
+table, th, td {
+  border: 1px solid var(--calcite-ui-border-1);
+  border-collapse: collapse;
+  padding: var(--calcite-spacing-quarter);
+  text-align: start;
 }
