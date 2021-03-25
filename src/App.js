@@ -21,6 +21,8 @@ import { CalciteDropdown, CalciteRadioButtonGroup } from './components/CalciteCo
 import propertyFnsByType from './helpers/PropertyFunctions';
 import spatialReferences, { getLabelForId } from './helpers/SpatialReferences';
 
+import { union } from '@arcgis/core/geometry/geometryEngine';
+
 import './App.css';
 
 load();
@@ -71,7 +73,7 @@ function App() {
     });
 
     const updateListener = sketch.on(['update'], function onChange(evt){
-      if(evt.state !== 'complete') return;
+      if(evt.state !== 'complete' || evt.aborted) return;
       setGraphic(evt.graphics[0].clone()); // force react to re-render
     })
 
@@ -92,11 +94,43 @@ function App() {
     setGraphic(graphic);
   }
 
-  function onClear(graphic){
+  function onClear(){
     const view = mapViewRef.current;
     view.graphics.removeAll();
     sketchLayer.removeAll();
     setGraphic(undefined);
+  }
+
+  function onConvertMultipoint(){
+    if(!graphic) return;
+    const geometry = graphic.geometry;
+    let points = []
+    if(geometry.type === 'polyline'){
+      for(let i = 0; i < geometry.paths.length; i++){
+        const path = geometry.paths[i];
+        for(let j = 0; j < path.length; j++){
+          points.push(geometry.getPoint(i, j))
+        }
+      }
+    }
+    const multipoint = union(points);
+    const newGraphic = {
+      symbol: {
+        type: "simple-marker", // autocasts as new SimpleMarkerSymbol()
+        color: [226, 119, 40],
+        outline: {
+          // autocasts as new SimpleLineSymbol()
+          color: [255, 255, 255],
+          width: 2
+        }
+      },
+      geometry: multipoint
+    }
+    const view = mapViewRef.current;
+    view.graphics.removeAll();
+    view.graphics.add(newGraphic);
+    sketchLayer.removeAll();
+    setGraphic(newGraphic);
   }
   
   let panelContent;
@@ -143,6 +177,13 @@ function App() {
           <calcite-label>
             <calcite-button scale="s" width="full" color="red" appearance="outline" onClick={onClear}>Clear geometries</calcite-button>
           </calcite-label>
+          { (graphic.geometry.type === 'polyline') &&
+            <calcite-label>
+              Manipulations
+              <calcite-button scale="s" width="full" appearance="outline" onClick={onConvertMultipoint}>Convert vertices to multi-point</calcite-button>
+            </calcite-label>
+          }
+          
           <calcite-label>
             Projection
             <CalciteDropdown
@@ -177,11 +218,15 @@ function App() {
         </calcite-block>
         <calcite-block heading="Properties" summary="Calculated values" open collapsible>
           <table style={{width: '100%'}}> 
-            <tr>
-              <th>Property</th>
-              <th>Value</th>
-            </tr>
-            {propertyDisplay}
+            <thead>
+              <tr>
+                <th>Property</th>
+                <th>Value</th>
+              </tr>
+            </thead>
+            <tbody>
+              {propertyDisplay}
+            </tbody>
           </table>
         </calcite-block>
       </>

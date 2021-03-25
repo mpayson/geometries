@@ -3,6 +3,8 @@ import { useRef, useEffect, useState } from 'react';
 import Graphic from '@arcgis/core/Graphic';
 import Polygon from '@arcgis/core/geometry/Polygon';
 import Point from '@arcgis/core/geometry/Point';
+import Polyline from '@arcgis/core/geometry/Polyline';
+import Multipoint from '@arcgis/core/geometry/Multipoint';
 
 import { arcgisToGeoJSON, geojsonToArcGIS } from "@terraformer/arcgis";
 
@@ -53,6 +55,7 @@ function GetStartedInfo({onAddGraphic}){
     } else if(strFormat === 'wkt'){
       geojson = wktToGeoJSON(value);
       esriJson = geojsonToArcGIS(geojson);
+      console.log(esriJson);
     }
     let geometry, symbol;
     switch(geojson.type){
@@ -60,8 +63,16 @@ function GetStartedInfo({onAddGraphic}){
         geometry = Polygon.fromJSON(esriJson);
         symbol = fillSymbol;
         break;
+      case 'LineString':
+        geometry = Polyline.fromJSON(esriJson);
+        symbol = lineSymbol;
+        break;
       case 'Point':
         geometry = Point.fromJSON(esriJson);
+        symbol = markerSymbol;
+        break;
+      case 'MultiPoint':
+        geometry = Multipoint.fromJSON(esriJson);
         symbol = markerSymbol;
         break;
       default:
