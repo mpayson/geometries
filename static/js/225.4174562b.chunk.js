@@ -1,2 +1,0 @@
-(this.webpackJsonpgeometries=this.webpackJsonpgeometries||[]).push([[225],{1196:function(e,s,t){"use strict";t.r(s);t(25),t(179),t(327);var i=t(426);t.d(s,"build",(function(){return i.b}))}}]);
-//# sourceMappingURL=225.4174562b.chunk.js.map
